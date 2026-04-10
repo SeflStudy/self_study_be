@@ -1,5 +1,6 @@
 using System.Text;
 using Application.Interfaces;
+using Application.Interfaces.Content;
 using Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Services;
@@ -66,7 +67,12 @@ builder.Services.AddAuthorization();
 // ── Application Services ──────────────────────────────────────────────────────
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
- 
+
+
+builder.Services.AddScoped<ISubjectService, SubjectService>();
+builder.Services.AddScoped<IHeadingService, HeadingService>();
+builder.Services.AddScoped<IContentService, ContentService>();
+
 // ── Controllers + Swagger ─────────────────────────────────────────────────────
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
