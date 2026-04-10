@@ -1,6 +1,7 @@
 using System.Text;
 using Application.Interfaces;
 using Application.Interfaces.Content;
+using Application.Interfaces.Flashcard;
 using Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Services;
@@ -70,6 +71,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 
 builder.Services.AddScoped<ISubjectService, SubjectService>();
+builder.Services.AddScoped<IFlashcardService, FlashcardService>();
+
 builder.Services.AddScoped<IHeadingService, HeadingService>();
 builder.Services.AddScoped<IContentService, ContentService>();
 

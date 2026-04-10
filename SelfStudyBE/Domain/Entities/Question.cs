@@ -59,7 +59,7 @@ public class Flashcard
  
     public string CreatedBy { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
- 
+    public DateTime? LastModifiedAt { get; set; }
     public Subject Subject { get; set; } = null!;
     public Heading? Heading { get; set; }
     public Content? Content { get; set; }

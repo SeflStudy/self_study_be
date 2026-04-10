@@ -130,7 +130,11 @@ public class AppDbContext : IdentityDbContext<AppUser>
              .HasForeignKey(fp => fp.FlashcardId)
              .OnDelete(DeleteBehavior.Cascade);
         });
- 
+        
+        builder.Entity<FlashcardProgress>()
+            .HasIndex(fp => new { fp.FlashcardId, fp.UserId })
+            .IsUnique();   // Mỗi user chỉ có 1 progress cho 1 flashcard
+        
         // ── FlashcardQuestion (composite PK, many-to-many) ───────────────
         builder.Entity<FlashcardQuestion>(e =>
         {
