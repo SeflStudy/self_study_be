@@ -61,26 +61,26 @@ Sau khi copy code từ bộ file này vào đúng thư mục:
 
 ```
 StudyApp/
-├── StudyApp.Domain/
+├── Domain/
 │   └── Entities/
 │       ├── AppUser.cs              ← Extend IdentityUser
 │       └── AllEntities.cs          ← Subject, Heading, Content, Question...
 │
-├── StudyApp.Application/
+├── Application/
 │   ├── DTOs/Auth/
 │   │   └── AuthDtos.cs             ← RegisterDto, LoginDto, AuthResultDto...
 │   └── Interfaces/
 │       ├── IAuthService.cs
 │       └── IJwtService.cs
 │
-├── StudyApp.Infrastructure/
+├── Infrastructure/
 │   ├── Data/
 │   │   └── AppDbContext.cs          ← DbContext + Identity + tất cả entities
 │   └── Services/
 │       ├── JwtService.cs            ← Tạo/validate JWT
 │       └── AuthService.cs           ← Register, Login, RefreshToken...
 │
-└── StudyApp.API/
+└── API/
     ├── Controllers/
     │   └── AuthController.cs        ← API endpoints
     ├── Program.cs                   ← DI, Middleware setup
@@ -116,12 +116,12 @@ StudyApp/
 ```bash
 # Từ thư mục gốc StudyApp/
 dotnet ef migrations add InitialCreate \
-    --project StudyApp.Infrastructure \
-    --startup-project StudyApp.API
+    --project Infrastructure \
+    --startup-project API
 
 dotnet ef database update \
-    --project StudyApp.Infrastructure \
-    --startup-project StudyApp.API
+    --project Infrastructure \
+    --startup-project API
 ```
 
 ---
@@ -129,7 +129,7 @@ dotnet ef database update \
 ## 6. Chạy ứng dụng
 
 ```bash
-dotnet run --project StudyApp.API
+dotnet run --project API
 ```
 
 Swagger UI: `https://localhost:5001/swagger`

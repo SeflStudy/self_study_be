@@ -9,9 +9,9 @@ public class Question
  
     public string QuestionText { get; set; } = string.Empty;
     // MCQ | MultiChoice | FillBlank | Essay
-    public string QuestionType { get; set; } = string.Empty;
+    public string QuestionType { get; set; } = "MCQ";
     public string? Explanation { get; set; }
-    public string Difficulty { get; set; } = string.Empty;
+    public string Difficulty { get; set; } = "Medium";
  
     public string CreatedBy { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
