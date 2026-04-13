@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Application.Interfaces.Content;
 using Application.Interfaces.Flashcard;
 using Application.Interfaces.Question;
+using Application.Interfaces.Quiz;
 using Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Services;
@@ -71,6 +72,8 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddHttpClient<OllamaService>();
+
+builder.Services.AddScoped<IQuizService, QuizService>();
 
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<OllamaService>();

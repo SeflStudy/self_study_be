@@ -30,3 +30,31 @@ public record CreateQuestionsFromAIResponse(
     int? ContentId,
     List<GeneratedQuestionDto> Questions
 );
+
+
+public record GenerateQuestionsFromFlashcardRequest(
+    int FlashcardId,
+    int NumberOfQuestions = 5,
+    string Difficulty = "Medium",
+    string Model = "llama3.2",
+    List<string> QuestionTypes = null   // ["MCQ", "FillBlank"] 
+);
+
+public record FlashcardToQuestionResponse(
+    int FlashcardId,
+    List<GeneratedQuestionDto> Questions
+);
+
+public record DeepReviewFlashcardRequest(
+    int FlashcardId,
+    int NumberOfQuestions = 6,
+    string Difficulty = "Medium",
+    string Model = "llama3.2"
+);
+
+public record DeepReviewSessionDto(
+    int FlashcardId,
+    string FlashcardFront,
+    string FlashcardBack,
+    List<GeneratedQuestionDto> Questions
+);

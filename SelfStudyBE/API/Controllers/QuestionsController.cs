@@ -25,6 +25,13 @@ public class QuestionsController : ControllerBase
         var questions = await _questionService.GenerateQuestionsAsync(request, CurrentUserId);
         return Ok(questions);
     }
+    
+    [HttpPost("deep-review/flashcard")]
+    public async Task<IActionResult> StartDeepReview([FromBody] DeepReviewFlashcardRequest request)
+    {
+        var session = await _questionService.StartDeepReviewAsync(request, CurrentUserId);
+        return Ok(session);
+    }
 
     [HttpPost("save")]
     public async Task<IActionResult> Save([FromBody] CreateQuestionsFromAIResponse request)
