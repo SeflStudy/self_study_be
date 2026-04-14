@@ -12,7 +12,14 @@ public interface IFlashcardService
     Task<List<FlashcardDto>> GetBySubjectAsync(int subjectId, string userId);
     Task<List<FlashcardDto>> GetByHeadingAsync(int headingId, string userId);
 
-   
+    Task<List<GeneratedFlashcardDto>> GenerateFlashcardsAsync(
+        GenerateFlashcardsRequest request, 
+        string userId);
+
+    Task<List<int>> SaveGeneratedFlashcardsAsync(
+        CreateFlashcardsFromAIResponse response, 
+        string userId);
+    
     Task<FlashcardProgressDto> UpdateProgressAsync(int flashcardId, bool isCorrect, string userId);
     Task<List<FlashcardProgressDto>> GetUserProgressAsync(int subjectId, string userId);
 }

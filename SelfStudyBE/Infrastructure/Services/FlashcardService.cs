@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Application.DTOs.Flashcard;
 using Application.Interfaces.Flashcard;
 using Domain.Entities;
@@ -9,10 +10,11 @@ namespace Infrastructure.Services;
 public class FlashcardService : IFlashcardService
 {
     private readonly AppDbContext _context;
-
-    public FlashcardService(AppDbContext context)
+    private readonly OllamaService _ollamaService;
+    public FlashcardService(AppDbContext context , OllamaService ollamaService)
     {
         _context = context;
+        this._ollamaService = ollamaService;
     }
 
     public async Task<FlashcardDto> CreateAsync(CreateFlashcardDto dto, string userId)
@@ -182,7 +184,125 @@ public class FlashcardService : IFlashcardService
 
         return progresses.Select(MapProgressToDto).ToList();
     }
+    
+    public async Task<List<GeneratedFlashcardDto>> GenerateFlashcardsAsync(
+    GenerateFlashcardsRequest request, 
+    string userId)
+{
+    // Kiểm tra quyền sở hữu Subject
+    var subject = await _context.Subjects
+        .FirstOrDefaultAsync(s => s.Id == request.SubjectId && s.CreatedBy == userId);
 
+    if (subject == null)
+        throw new UnauthorizedAccessException("Subject not found or access denied.");
+
+    // Lấy nội dung để generate
+    var contents = await GetContentsForFlashcardGeneration(request);
+
+    if (!contents.Any())
+        throw new InvalidOperationException("No content found to generate flashcards.");
+
+    var combinedText = string.Join("\n\n---\n\n", contents.Select(c =>
+        $"Tiêu đề: {c.Heading?.Title ?? "Không có tiêu đề"}\nNội dung:\n{c.Body}"));
+
+    var prompt = $@"
+Bạn là chuyên gia tạo Flashcard chất lượng cao bằng tiếng Việt.
+
+Hãy tạo đúng {request.NumberOfFlashcards} flashcards dựa trên nội dung sau.
+
+Yêu cầu:
+- FrontText: Câu hỏi hoặc khái niệm ngắn gọn, rõ ràng, dễ hiểu
+- BackText: Giải thích chi tiết, công thức, ví dụ (nếu có)
+- Nội dung phải chính xác và phù hợp để ôn tập
+- Trả về **chỉ** một mảng JSON, không thêm bất kỳ chữ nào khác.
+
+Định dạng JSON:
+[
+  {{
+    ""frontText"": ""Đạo hàm của hàm f(x) = x² là gì?"",
+    ""backText"": ""f'(x) = 2x\n\nGiải thích: Áp dụng quy tắc đạo hàm lũy thừa.""
+  }}
+]
+
+Nội dung tham khảo:
+{combinedText}
+
+Bắt đầu tạo flashcards ngay:";
+
+    var rawJson = await _ollamaService.GenerateAsync(request.Model, prompt, temperature: 0.7f);
+
+    try
+    {
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var flashcards = JsonSerializer.Deserialize<FlashCardResponse>(rawJson, options);
+        
+        var generatedFlashCards = flashcards?.FlashCards ?? new List<GeneratedFlashcardDto>();
+        
+        return generatedFlashCards ?? new List<GeneratedFlashcardDto>();
+    }
+    catch (Exception ex)
+    {
+        throw new InvalidOperationException($"Không thể parse JSON từ Ollama: {ex.Message}");
+    }
+}
+
+private async Task<List<Content>> GetContentsForFlashcardGeneration(GenerateFlashcardsRequest request)
+{
+    IQueryable<Content> query = _context.Contents
+        .Include(c => c.Heading);
+
+    if (request.ContentId.HasValue)
+    {
+        query = query.Where(c => c.Id == request.ContentId.Value);
+    }
+    else if (request.HeadingId.HasValue)
+    {
+        query = query.Where(c => c.HeadingId == request.HeadingId.Value);
+    }
+    else
+    {
+        query = query.Where(c => c.Heading.SubjectId == request.SubjectId);
+    }
+
+    return await query.ToListAsync();
+}
+
+    public async Task<List<int>> SaveGeneratedFlashcardsAsync(
+        CreateFlashcardsFromAIResponse response, 
+        string userId)
+    {
+        var savedIds = new List<int>();
+
+        foreach (var fc in response.Flashcards)
+        {
+            var flashcard = new Flashcard
+            {
+                SubjectId = response.SubjectId,
+                HeadingId = response.HeadingId,
+                ContentId = response.ContentId,
+                FrontText = fc.FrontText.Trim(),
+                BackText = fc.BackText.Trim(),
+                CreatedBy = userId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Flashcards.Add(flashcard);
+            await _context.SaveChangesAsync();
+
+            savedIds.Add(flashcard.Id);
+        }
+
+        return savedIds;
+    }
+    
+    
+    
+    public class FlashCardResponse
+    {
+        public List<GeneratedFlashcardDto> FlashCards { get; set; }
+    }
+    
+    
     private static FlashcardDto MapToDto(Flashcard f) =>
         new FlashcardDto(
             f.Id, f.SubjectId, f.HeadingId, f.ContentId,

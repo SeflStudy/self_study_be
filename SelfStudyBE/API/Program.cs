@@ -2,9 +2,11 @@ using System.Text;
 using Application.Interfaces;
 using Application.Interfaces.Content;
 using Application.Interfaces.Flashcard;
+using Application.Interfaces.Payment;
 using Application.Interfaces.Question;
 using Application.Interfaces.Quiz;
 using Domain.Entities;
+using Infrastructure.Configurations;
 using Infrastructure.Data;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -83,6 +85,10 @@ builder.Services.AddScoped<IFlashcardService, FlashcardService>();
 
 builder.Services.AddScoped<IHeadingService, HeadingService>();
 builder.Services.AddScoped<IContentService, ContentService>();
+
+// Trong builder.Services
+builder.Services.Configure<PayOSSettings>(builder.Configuration.GetSection("PayOS"));
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 // ── Controllers + Swagger ─────────────────────────────────────────────────────
 builder.Services.AddControllers();

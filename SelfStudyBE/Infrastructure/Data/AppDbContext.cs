@@ -227,6 +227,28 @@ public class AppDbContext : IdentityDbContext<AppUser>
             e.Property(p => p.Price).HasColumnType("decimal(18,2)");
         });
  
+        builder.Entity<SubscriptionPlan>().HasData(
+            new SubscriptionPlan {
+                Id=1,
+                Name= "VIP Monthly",
+                Price= 2000,
+                DurationDays= 30,
+                MaxFlashcardsPerDay= 100,
+                MaxQuizPerDay= 20,
+                MaxAIUsagePerDay= 50
+            },
+            new SubscriptionPlan {
+                Id=2,
+                Name= "VIP Monthly",
+                Price= 2000,
+                DurationDays= 30,
+                MaxFlashcardsPerDay= 100,
+                MaxQuizPerDay= 20,
+                MaxAIUsagePerDay= 50
+            }
+        );
+        
+        
         // ── RefreshToken ─────────────────────────────────────────────────
         builder.Entity<RefreshToken>(e =>
         {

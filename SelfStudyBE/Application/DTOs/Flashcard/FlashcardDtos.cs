@@ -31,3 +31,23 @@ public record FlashcardProgressDto(
     DateTime? NextReviewAt,
     DateTime? LastReviewedAt
 );
+
+public record GenerateFlashcardsRequest(
+    int SubjectId,
+    int? HeadingId = null,      // null = toàn bộ Subject
+    int? ContentId = null,      // null = theo Heading hoặc Subject
+    int NumberOfFlashcards = 10,
+    string Model = "llama3"
+);
+
+public record GeneratedFlashcardDto(
+    string FrontText,
+    string BackText
+);
+
+public record CreateFlashcardsFromAIResponse(
+    int SubjectId,
+    int? HeadingId,
+    int? ContentId,
+    List<GeneratedFlashcardDto> Flashcards
+);

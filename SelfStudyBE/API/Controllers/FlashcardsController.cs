@@ -76,4 +76,17 @@ public class FlashcardsController : ControllerBase
         var result = await _flashcardService.GetUserProgressAsync(subjectId, CurrentUserId);
         return Ok(result);
     }
+    
+    [HttpPost("generate-ai")]
+    public async Task<IActionResult> GenerateAiFlashcards([FromBody] GenerateFlashcardsRequest request)
+    {
+        var flashcards = await _flashcardService.GenerateFlashcardsAsync(request, CurrentUserId);
+        return Ok(new { Flashcards = flashcards });
+    }
+    [HttpPost("save-ai")]
+    public async Task<IActionResult> SaveAiFlashcards([FromBody] CreateFlashcardsFromAIResponse request)
+    {
+        var savedIds = await _flashcardService.SaveGeneratedFlashcardsAsync(request, CurrentUserId);
+        return Ok(new { Message = $"{savedIds.Count} flashcards created successfully", FlashcardIds = savedIds });
+    }
 }
